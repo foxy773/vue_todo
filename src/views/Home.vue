@@ -44,6 +44,13 @@ export default {
       this.storeInLocal()
       return filteredList;
       }
+    },
+
+    unCheckedList() {
+      let unCheckedList = this.filteredList.filter((country) => {
+        return country.done === false
+      })
+      return unCheckedList
     }
   },
 
@@ -67,38 +74,19 @@ export default {
       this.setupDone = true 
     },
 
-
-		/* unorganized.filter(function (obj) {
-			unorganized.push(obj.name)
-    
-		})
-
-		organized.forEach(function (element, index) {
-			organized[index] = {...element, done:false}
-			
-		})
-		this.filteredCountries = organized
-		console.log(this.filteredCountries, "filteredC") 
-	},*/
-
 	toggleDone(country){
 		return country.done = !country.done
 	},
 
-  /* inputInfocus() {        // To be fixed
-      const el = document.getElementById("new-todo")
-      const isFocused = el === document.activeElement
-      if (isFocused) {
-        console.log("IsActive")
-      } else {
-        console.log("IsNOTActive")
-        this.autoFillInput()
-      }
-    }, */
-
   autoFillInput() {
-    if (this.searchText.length > 0){
-    this.searchText = this.filteredList[0].name.common
+    console.log(this.unCheckedList)
+    if (this.searchText.length > 0 && this.unCheckedList.length > 0){
+
+      this.searchText = this.unCheckedList[0].name.common
+
+    } else {
+
+      this.searchText = ""
     }
   },
 
