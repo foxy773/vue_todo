@@ -2,11 +2,11 @@
 <section id="todoapp">
    <header id="header">
      <h1>Travel-List</h1>
-     <input id="new-todo" v-model="searchText" placeholder="Country I want to visit">
+     <input id="new-todo" v-model="searchText" placeholder="Country I want to visit" @blur="autoFillInput()" @keyup.enter="autoFillInput()">
    </header>
    <section id="main">
      <ul id="todo-list" >
-		 <CountryToDo v-for="(country, index) in filteredList" :key="country.id" :name="country.name.common" :done="country.done" @click="toggleDone(country)" />
+		 <CountryToDo v-for="(country, index) in filteredList" :key="country.id" :name="country.name.common" :done="country.done" @click="toggleDone(country)"/>
      </ul>
    </section>
  </section>
@@ -24,39 +24,53 @@ export default {
       searchText: "",
       filteredCountries: [],
       countries: null,
+      setupDone: false
     };
   },
 
   async created() {
-	  this.organizeArray()
+	  this.checkLocalStorage()
     /* this.fetchCountries(); */
   },
 
   computed: {
     filteredList() {
-      const filteredList = this.countries.filter((country) => {
+      if (this.setupDone) {
+      let filteredList = this.filteredCountries.filter((country) => {
         return country.name.common
           .toLowerCase()
           .includes(this.searchText.toLowerCase());
       });
+      this.storeInLocal()
       return filteredList;
-    },
+      }
+    }
   },
+
   methods: {
     async fetchCountries() {
       const API = `https://restcountries.com/v3.1/all`;
 
       const res = await fetch(API);
       const results = await res.json();
-      this.countries = results;
       return results;
     },
 
 	async organizeArray() {
-		const unorganized = await this.fetchCountries()
-		let organized = []
-		unorganized.filter(function (obj) {
-			organized.push(obj.name)
+		let unorganized = await this.fetchCountries()
+    let organized = []
+    unorganized.forEach((country) => {
+      country = {...country, done:false}
+      organized.push(country)
+    })
+      this.filteredCountries = organized
+      this.setupDone = true 
+    },
+
+
+		/* unorganized.filter(function (obj) {
+			unorganized.push(obj.name)
+    
 		})
 
 		organized.forEach(function (element, index) {
@@ -64,16 +78,55 @@ export default {
 			
 		})
 		this.filteredCountries = organized
-		console.log(this.filteredCountries)
-	},
+		console.log(this.filteredCountries, "filteredC") 
+	},*/
 
 	toggleDone(country){
-		console.log(country, "test")
 		return country.done = !country.done
-	}
+	},
+
+  /* inputInfocus() {        // To be fixed
+      const el = document.getElementById("new-todo")
+      const isFocused = el === document.activeElement
+      if (isFocused) {
+        console.log("IsActive")
+      } else {
+        console.log("IsNOTActive")
+        this.autoFillInput()
+      }
+    }, */
+
+  autoFillInput() {
+    if (this.searchText.length > 0){
+    this.searchText = this.filteredList[0].name.common
+    }
   },
 
-  mounted() {},
+  storeInLocal() {
+    localStorage.setItem("Countries", JSON.stringify(this.filteredCountries))
+  },
+
+  getFromLocal() {
+    this.filteredCountries = JSON.parse(localStorage.getItem("Countries"))
+    this.setupDone = true 
+  },
+
+  checkLocalStorage() {   // Checks if localstorage contains any data. If it does it will get the data
+    if (localStorage.getItem("Countries") !== null || localStorage.length > 0) {
+      this.getFromLocal() // LocalStorage is empty
+      console.log("Getting from Local")
+    } else {
+      this.organizeArray() 
+      console.log("Not anything in local")
+    }
+  }
+
+  },
+
+  mounted() {
+
+  },
+
 };
 </script>
 <style scoped>
