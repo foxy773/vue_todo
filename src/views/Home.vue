@@ -1,4 +1,5 @@
 <template>
+<body>
 <section id="todoapp">
    <header id="header">
      <h1>Travel-List</h1>
@@ -10,6 +11,7 @@
      </ul>
    </section>
  </section>
+ </body>
 </template>
 
 <script>
@@ -79,7 +81,6 @@ export default {
 	},
 
   autoFillInput() {
-    console.log(this.unCheckedList)
     if (this.searchText.length > 0 && this.unCheckedList.length > 0){
 
       this.searchText = this.unCheckedList[0].name.common
