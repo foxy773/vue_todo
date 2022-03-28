@@ -32,27 +32,29 @@ export default {
 
   async created() {
 	  this.checkLocalStorage()
-    /* this.fetchCountries(); */
   },
 
   computed: {
     filteredList() {
       if (this.setupDone) {
       let filteredList = this.filteredCountries.filter((country) => {
+
         return country.name.common
           .toLowerCase()
           .includes(this.searchText.toLowerCase());
       });
+
       this.storeInLocal()
       return filteredList;
       }
     },
 
-    unCheckedList() {
-      let unCheckedList = this.filteredList.filter((country) => {
+    CheckedList() {
+      let CheckedList = this.filteredList.filter((country) => {
         return country.done === false
       })
-      return unCheckedList
+
+      return CheckedList
     }
   },
 
@@ -68,10 +70,12 @@ export default {
 	async organizeArray() {
 		let unorganized = await this.fetchCountries()
     let organized = []
+
     unorganized.forEach((country) => {
       country = {...country, done:false}
       organized.push(country)
     })
+
       this.filteredCountries = organized
       this.setupDone = true 
     },
@@ -81,12 +85,9 @@ export default {
 	},
 
   autoFillInput() {
-    if (this.searchText.length > 0 && this.unCheckedList.length > 0){
-
-      this.searchText = this.unCheckedList[0].name.common
-
+    if (this.searchText.length > 0 && this.CheckedList.length > 0){
+      this.searchText = this.CheckedList[0].name.common
     } else {
-
       this.searchText = ""
     }
   },
@@ -102,14 +103,15 @@ export default {
 
   checkLocalStorage() {   // Checks if localstorage contains any data. If it does it will get the data
     if (localStorage.getItem("Countries") !== null || localStorage.length > 0) {
-      this.getFromLocal() // LocalStorage is empty
-      console.log("Getting from Local")
+
+      this.getFromLocal() // LocalStorage has data.
+
     } else {
-      this.organizeArray() 
-      console.log("Not anything in local")
+
+      this.organizeArray() // LocalStorage has no data and will fetch new data.
     }
   }
-
+  
   },
 
   mounted() {
